@@ -1,0 +1,21 @@
+FROM node:alpine
+
+WORKDIR "/app"
+
+COPY package.json .
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "run", "start"]
+
+# docker build -f Dockerfile.dev .
+# docker run -it -p 3000:3000 CONTAINER_ID
+# docker run -it CONTAINER_ID npm run test
+# docker run -it -p 3000:3000 -v /app/node_modules -v  %cd%:/app CONTAINER_ID --- filesharing of folders src, build... except node_modules
+# docker run -it -p 3000:3000 -v /app/node_modules -v  $(pwd):/app CONTAINER_ID --- (only from BASH) filesharing of folders src, build... except node_modules
+
+# docker-compose up
+# docker-compose up --build
+
+# 41f6a33b850d955a69206763f0fc8b871af32b009f2b40a63fcfa2172d6891ec
