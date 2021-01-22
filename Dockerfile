@@ -9,6 +9,7 @@ RUN npm run build
 # Run phase
 # /usr/share/nginx/html is nginx folder to serve static html files
 FROM nginx as runner
+EXPOSE 80
 COPY --from=builder /app/build /usr/share/nginx/html
 
 # docker build .
