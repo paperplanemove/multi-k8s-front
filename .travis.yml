@@ -10,3 +10,29 @@ before_install:
 
 script:
   - docker run -e CI=true paperplanemove/docker-react npm run test
+
+deploy:
+  provider: elasticbeanstalk
+  region: "eu-central-1"
+  app: "docker-react"
+  env: "DockerReact-env"
+  bucket_name: "elasticbeanstalk-eu-central-1-749335276776"
+  bucket_path: "docker-react"
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+
+
+# app - Application name in aws beanstalk
+# env - Environment name in aws beanstalk
+# bucket_name - S3 bucket name in aws
+# bucket_path - app name
+
+# Create new user in aws iam section -> give full access to elasticbeanstalk on permissions
+# then go to travis-ci.com more options -> settings -> Environment variables
+# access_key_id: $AWS_ACCESS_KEY
+# secret_access_key: $AWS_SECRET_KEY
+
+#
+#
