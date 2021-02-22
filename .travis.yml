@@ -1,36 +1,27 @@
 language: generic
-
 services:
   - docker
-
+env:
+  global:
+    - SHA=$(git rev-parse HEAD)
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 before_install:
-  - docker build -t paperplanemove/docker-react -f Dockerfile.dev .
-
+  - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
+  - curl https://sdk.cloud.google.com | bash > /dev/null;
+  - source $HOME/google-cloud-sdk/path.bash.inc
+  - gcloud components update kubectl
+  - gcloud auth activate-service-account --key-file service-account.json
+  - gcloud config set project multi-k8n-305219
+  - gcloud config set compute/zone europe-north1-a
+  - gcloud container clusters get-credentials multi-cluster
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker build -t alekseysoroka/react-test -f ./client/Dockerfile.dev ./client
+  -
 script:
-  - docker run -e CI=true paperplanemove/docker-react npm run test
+  - docker run -e CI=true alekseysoroka/react-test npm test -- --coverage
 
 deploy:
-  provider: elasticbeanstalk
-  region: "eu-central-1"
-  app: "docker-react"
-  env: "DockerReact-env"
-  bucket_name: "elasticbeanstalk-eu-central-1-749335276776"
-  bucket_path: "docker-react"
+  provider: script
+  script: bash ./deploy.sh
   on:
     branch: master
-  access_key_id: $AWS_ACCESS_KEY
-  secret_access_key: $AWS_SECRET_KEY
-
-
-# app - Application name in aws beanstalk
-# env - Environment name in aws beanstalk
-# bucket_name - S3 bucket name in aws
-# bucket_path - app name
-
-# Create new user in aws iam section -> give full access to elasticbeanstalk on permissions
-# then go to travis-ci.com more options -> settings -> Environment variables
-# access_key_id: $AWS_ACCESS_KEY
-# secret_access_key: $AWS_SECRET_KEY
-
-#
-#
